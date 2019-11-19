@@ -10,6 +10,7 @@ const uglify = require( 'gulp-uglify' );
 const sass = require( 'gulp-sass' );
 const babelify = require( 'babelify' );
 const browserify = require( 'browserify' );
+const scssify = require( 'scssify' );
 const source = require( 'vinyl-source-stream' );
 const buffer = require( 'vinyl-buffer' );
 const rename = require( 'gulp-rename' );
@@ -58,11 +59,11 @@ const js = ( done ) => {
             plugins: [
               [
                 '@babel/plugin-proposal-class-properties',
-                '@babel/syntax-dynamic-import',
               ],
             ],
           },
       )
+      .transform( scssify )
       .bundle()
       .pipe( source( 'index.js' ) )
       .pipe( rename( {
@@ -86,5 +87,5 @@ const watch_files = () => {
 
 task( 'css', css );
 task( 'js', js );
-task( 'default', parallel( css, js ) );
+task( 'default', js );
 task( 'watch', parallel( browser_sync, watch_files ) );

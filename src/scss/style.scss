@@ -1,3 +1,10 @@
+@import './react-datepicker.min.css';
+@import './react-datepicker-cssmodules.min.css';
+
+.react-datepicker__month-wrapper{
+  display: flex !important;
+}
+
 html, body, #root, .App {
   height: 100%;
 }
@@ -10,16 +17,6 @@ html, body, #root, .App {
   opacity: 0.5;
 }
 
-// .ReportContainer{
-//   width: 27% !important;
-//   margin-left: 3% !important;
-//   display: inline-block !important;
-// }
-//
-// .ShelvesContainer{
-//   width: 70% !important;
-//   display: inline-block !important;
-// }
 .AnnualReportContainer{
   margin-left: 2% !important;
 
@@ -73,6 +70,7 @@ html, body, #root, .App {
   }
 
   .CardYear{
+    text-align: center;
     grid-row: 2 / 3;
     grid-column: 3 / 4;
     overflow: hidden;

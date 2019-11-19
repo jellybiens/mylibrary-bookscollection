@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Image, Card, Button, Form } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import coverUnknown from '../../imgs/covernotfound.jpg';
 
 const BookCover = (
@@ -83,16 +82,17 @@ const BookCover = (
         <>
           <div className="CardBookStatus" >
             <Form>
-              <Form.Control value={readStatus} onChange={handleSelectChange} as="select">
+              <Form.Control className="statusDd" value={readStatus} onChange={handleSelectChange} as="select">
                 <option value="not">Not read</option>
                 <option value="rdn">Reading</option>
-                <option value="fin">Finished</option>
+                <option id="optfin" value="fin">Finished</option>
               </Form.Control>
             </Form>
           </div>
           <div className="CardFinishDate" >
             { readStatus === 'fin' &&
               <DatePicker
+                id="datePicker"
                 className="form-control"
                 selected={finishDate}
                 onChange={handleDateChange}
@@ -109,7 +109,7 @@ const BookCover = (
       <div className="CardButton" >
         <Button
           disabled={inCollection}
-          className={inCollection && 'disabled'}
+          className={inCollection ? 'disabled' : 'addBook'}
           variant={inCollection ? 'outline-success' : 'outline-primary'}
           onClick={handleAddToCollection}
         >

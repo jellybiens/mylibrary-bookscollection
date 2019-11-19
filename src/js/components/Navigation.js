@@ -25,10 +25,10 @@ const Navigation = () => {
       <Navbar.Brand>Library</Navbar.Brand>
       <Nav className="mr-auto">
         <Nav.Link as={NavLink} to="/MyBooks">
-          <span>My Books</span>
+          <span id="NavMyBooks" >My Books</span>
         </Nav.Link>
         <Nav.Link as={NavLink} to="/AnnualReport" >
-          <span>Annual Report</span>
+          <span id="NavAnnualReport">Annual Report</span>
         </Nav.Link>
       </Nav>
       <Form inline>
