@@ -36,6 +36,11 @@ module.exports = {
   },
   devServer: {
     historyApiFallback: true,
+    proxy: {
+      '/graphql': {
+        target: 'http://localhost:3000',
+      },
+    },
   },
   plugins: [
     new MiniCssExtractPlugin( {

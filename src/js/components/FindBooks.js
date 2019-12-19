@@ -1,36 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { useQuery } from '@apollo/react-hooks';
+import gql from 'graphql-tag';
 import Navigation from './Navigation';
 import { Container, Row, Col, Spinner } from 'react-bootstrap';
 import BookShelves from './BookShelves';
 
-const FindBooks = ( { location: { pathname }, match: { params: { searchText } } } ) => {
-  const [isLoading, setIsLoading] = useState( true );
-  const [foundBooks, setFoundBooks] = useState( [] );
+const BOOKS_SEARCH_QUERY = gql`
+  query BooksSearchQuery($queryString: String = "Lord+of+the+rings") {
+    booksResults: booksResults(queryString: $queryString) {
+      key_id
+      title
+      cover_i
+      author_name
+      first_publish_year
+      isbn
+    }
+  }
+`;
 
-  useEffect( () => {
-    fetch( `http://openlibrary.org/search.json?title=${searchText}&has_fulltext=true` )
-        .then( ( res ) => res.json() )
-        .then( ( json ) => {
-          const booksResults =
-            json.docs.reduce( ( map, obj ) => {
-              map[obj.key] = {
-                key_id: obj.key,
-                title: obj.title,
-                cover_i: obj.cover_i,
-                author_name: obj.author_name,
-                first_publish_year: obj.first_publish_year,
-                isbn: obj.isbn,
-              };
-              return map;
-            }, {} );
-          setFoundBooks( booksResults );
-          setIsLoading( false );
-        } );
-  }, [] );
+const FindBooks = ( { location: { pathname }, match: { params: { queryString } } } ) => {
+  const { loading, error, data } = useQuery( BOOKS_SEARCH_QUERY, {
+    variables: { queryString },
+  } );
 
   const renderResults = () => {
-    if ( isLoading ) {
+    if ( loading ) {
       return (
         <Col>
           <Spinner className="d-block m-auto" animation="border" role="status">
@@ -39,15 +34,19 @@ const FindBooks = ( { location: { pathname }, match: { params: { searchText } } 
         </Col>
       );
     }
+    if ( error ) return <span>An error occurred.</span>;
 
-    return <BookShelves books={foundBooks} pathname={pathname} />;
+    const { booksResults = [] } = data;
+    return <BookShelves books={booksResults} pathname={pathname} />;
   };
 
   return (
     <>
       <Navigation path={pathname} />
       <Container>
-        <Row> { renderResults() } </Row>
+        <Row>
+          { renderResults() }
+        </Row>
       </Container>
     </>
   );
@@ -56,7 +55,7 @@ const FindBooks = ( { location: { pathname }, match: { params: { searchText } } 
 FindBooks.propTypes = {
   location: PropTypes.object,
   match: PropTypes.object,
-  searchText: PropTypes.string,
+  queryString: PropTypes.string,
 };
 
 export default FindBooks;

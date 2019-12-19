@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { NavLink, useHistory } from 'react-router-dom';
-import { Navbar, Nav, Form, FormControl, Button } from 'react-bootstrap';
+import { Button, AppBar, Toolbar, Typography, Link, InputBase } from '@material-ui/core';
 
 const Navigation = () => {
-  const [searchText, setSearchText] = useState( '' );
+  const [queryString, setQueryString] = useState( '' );
   const history = useHistory();
 
   const searchOnChange = ( { target: { value } } ) => {
-    setSearchText( value );
+    setQueryString( value );
   };
 
   const returnRedirect = () => {
-    return history.push( `/FindBooks/${searchText.replace( / /g, '+' )}` );
+    return history.push( `/FindBooks/${queryString.replace( / /g, '+' )}` );
   };
 
   const handleKeyPress = ( { key } ) => {
@@ -21,27 +21,30 @@ const Navigation = () => {
   };
 
   return (
-    <Navbar fixed="top" bg="dark" className="mb-5" variant="dark">
-      <Navbar.Brand>Library</Navbar.Brand>
-      <Nav className="mr-auto">
-        <Nav.Link as={NavLink} to="/MyBooks">
-          <span id="NavMyBooks" >My Books</span>
-        </Nav.Link>
-        <Nav.Link as={NavLink} to="/AnnualReport" >
-          <span id="NavAnnualReport">Annual Report</span>
-        </Nav.Link>
-      </Nav>
-      <Form inline>
-        <FormControl
-          type="text"
-          onChange={searchOnChange}
-          onKeyDown={handleKeyPress}
-          placeholder="Find books"
-          className="mr-sm-2"
+    <AppBar position="static">
+      <Toolbar>
+        <Typography variant="h6" noWrap>
+                Material-UI
+        </Typography>
+        <Link conponent={NavLink} to="/MyBooks">
+                My Books
+        </Link>
+        <Link component={NavLink} to="/MyBooks">
+                Annual Report
+        </Link>
+        <InputBase
+          placeholder="Search library…"
+          inputProps={
+            {
+              'aria-label': 'search',
+              'onChange': searchOnChange,
+              'onKeyDown': handleKeyPress,
+            }
+          }
         />
         <Button variant="outline-primary" onClick={returnRedirect} >Search</Button>
-      </Form>
-    </Navbar>
+      </Toolbar>
+    </AppBar>
   );
 };
 

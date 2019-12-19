@@ -6,78 +6,66 @@ import coverUnknown from '../../imgs/covernotfound.jpg';
 
 const BookCover = (
     {
-      key_id,
-      title,
-      cover_i,
-      author_name,
-      first_publish_year,
-      isbn,
-      read_status,
-      date,
-      myBooks,
-      report,
-      bookOwned,
+      bookObj,
+      bookInCollection,
       updateCollection,
+      pathname,
     },
 ) => {
+  const {
+    key_id,
+    title,
+    cover_i,
+    author_name,
+    first_publish_year,
+    isbn,
+    read_status,
+    date,
+  } = bookObj;
   const cover = cover_i ?
     `http://covers.openlibrary.org/b/id/${cover_i}-M.jpg` :
     coverUnknown;
 
-  const [inCollection, setInCollection] = useState( bookOwned );
+  const [inCollection, setInCollection] = useState( bookInCollection );
   const [readStatus, setReadStatus] = useState( read_status );
   const [finishDate, setFinishDate] = useState( new Date( date ) );
 
 
   // FindBooks
   const handleAddToCollection = () => {
-    const bookToAdd = {
-      key_id,
-      title,
-      cover_i,
-      author_name: [author_name[0]],
-      first_publish_year,
-      isbn: [isbn[0]],
-      read_status: readStatus,
+    const bookToUpdate = {
+      ...bookObj,
+      read_status: 'not',
       date: new Date(),
     };
     setInCollection( true );
-    updateCollection( bookToAdd );
+    updateCollection( bookToUpdate );
   };
 
   // MyBooks
-  const handleSelectChange = ( { target: { value: read_status } } ) => {
+  const handleSelectChange = ( { target: { value } } ) => {
     const bookToUpdate = {
-      key_id,
-      title,
-      cover_i,
-      author_name: [author_name[0]],
-      first_publish_year,
-      isbn: [isbn[0]],
-      read_status,
-      date: finishDate,
+      ...bookObj,
+      read_status: value,
+      date: new Date(),
     };
-    setReadStatus( read_status );
+    setReadStatus( value );
+    setFinishDate( new Date() );
     updateCollection( bookToUpdate );
   };
 
-  const handleDateChange = ( date ) => {
+  const handleDateChange = ( value ) => {
     const bookToUpdate = {
-      key_id,
-      title,
-      cover_i,
-      author_name: [author_name[0]],
-      first_publish_year,
-      isbn: [isbn[0]],
-      read_status: readStatus,
-      date,
+      ...bookObj,
+      read_status: 'fin',
+      date: value,
     };
-    setFinishDate( date );
+    setFinishDate( value );
     updateCollection( bookToUpdate );
   };
 
-  const renderOptions = () => {
-    if ( myBooks ) {
+  const renderBookCoverOptions = () => {
+    if ( pathname === '/MyBooks' ) {
       return (
         <>
           <div className="CardBookStatus" >
@@ -85,7 +73,7 @@ const BookCover = (
               <Form.Control className="statusDd" value={readStatus} onChange={handleSelectChange} as="select">
                 <option value="not">Not read</option>
                 <option value="rdn">Reading</option>
-                <option id="optfin" value="fin">Finished</option>
+                <option value="fin">Finished</option>
               </Form.Control>
             </Form>
           </div>
@@ -103,30 +91,31 @@ const BookCover = (
           </div>
         </>
       );
+    } else if ( pathname.startsWith( '/FindBooks' ) ) {
+    // Button to add to collection for FindBooks, can be disabled if already owned
+      return (
+        <div className="CardButton" >
+          <Button
+            disabled={inCollection}
+            className={inCollection ? 'disabled' : 'addBook'}
+            variant={inCollection ? 'outline-success' : 'outline-primary'}
+            onClick={handleAddToCollection}
+          >
+            {inCollection ? 'In collection' : 'Add to my books'}
+          </Button>
+        </div>
+      );
     }
-    // Button to add to collection for FindBooks, can be disabled is already owned
-    return (
-      <div className="CardButton" >
-        <Button
-          disabled={inCollection}
-          className={inCollection ? 'disabled' : 'addBook'}
-          variant={inCollection ? 'outline-success' : 'outline-primary'}
-          onClick={handleAddToCollection}
-        >
-          {inCollection ? 'In collection' : 'Add to my books'}
-        </Button>
-      </div>
-    );
   };
 
   return (
-    <Card>
+    <Card key={key_id}>
       <Card.Body className={
-        inCollection && !myBooks && !report ?
+        inCollection && pathname.startsWith( '/FindBooks' ) ?
         'CardBody disabled' : 'CardBody'
       }>
         <Card.Title className="CardTitle">{title}</Card.Title>
-        <Card.Subtitle className="CardAuthor text-muted">{author_name[0]}</Card.Subtitle>
+        <Card.Subtitle className="CardAuthor text-muted">{author_name}</Card.Subtitle>
         <Card.Subtitle className="CardYear text-muted">{first_publish_year ? first_publish_year : 'Unknown Year'}</Card.Subtitle>
         <div className="CardImage">
           <Image rounded
@@ -134,40 +123,43 @@ const BookCover = (
             src={cover}
           />
         </div>
-        <Card.Subtitle className="CardIsbn text-muted">{'ISBN: ' + isbn[0]}</Card.Subtitle>
-        {!report && renderOptions()}
+        <Card.Subtitle className="CardIsbn text-muted">{'ISBN: ' + isbn}</Card.Subtitle>
+        {renderBookCoverOptions()}
       </Card.Body>
     </Card>
   );
 };
 
 BookCover.propTypes = {
-  key_id: PropTypes.string,
-  title: PropTypes.string,
-  cover_i: PropTypes.any,
-  author_name: PropTypes.arrayOf( PropTypes.string ),
-  first_publish_year: PropTypes.number,
-  isbn: PropTypes.arrayOf( PropTypes.string ),
-  read_status: PropTypes.string,
-  date: PropTypes.any,
-  myBooks: PropTypes.bool,
-  report: PropTypes.bool,
-  bookOwned: PropTypes.bool,
+  bookObj: PropTypes.shape( {
+    key_id: PropTypes.string,
+    title: PropTypes.string,
+    cover_i: PropTypes.any,
+    author_name: PropTypes.string,
+    first_publish_year: PropTypes.number,
+    isbn: PropTypes.string,
+    read_status: PropTypes.string,
+    date: PropTypes.any,
+  } ),
+  bookInCollection: PropTypes.bool,
   updateCollection: PropTypes.func,
+  pathname: PropTypes.string,
 };
 
 BookCover.defaultProps = {
-  key_id: 'xxxxxxxx',
-  title: 'Uknown Title',
-  cover_i: null,
-  author_name: ['Uknown Author'],
-  first_publish_year: null,
-  isbn: ['-'],
-  read_status: 'not',
-  myBooks: false,
-  report: false,
-  bookOwned: false,
+  bookObj: {
+    key_id: 'xxxxxxxx',
+    title: 'Uknown Title',
+    cover_i: null,
+    author_name: 'Uknown Author',
+    first_publish_year: null,
+    isbn: '-',
+    read_status: 'not',
+    date: new Date(),
+  },
+  bookInCollection: false,
   updateCollection: () => {},
+  pathname: '/MyBooks',
 };
 
 

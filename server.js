@@ -2,13 +2,21 @@ const express = require( 'express' );
 const path = require( 'path' );
 
 const cors = require( 'cors' );
-// require('dotenv').config();
+const graphqlHTTP = require( 'express-graphql' );
+const schema = require( './schema' );
 
 // config
 const APP_PORT = process.env.PORT || 3000;
 const app = express();
 
 app.use( cors() );
+
+app.use( '/graphql', graphqlHTTP( {
+  schema: schema,
+  pretty: true,
+  graphiql: true,
+
+} ) );
 
 // the __dirname is the current directory from where the script is running
 app.use( express.static( __dirname + '/public/' ) );
