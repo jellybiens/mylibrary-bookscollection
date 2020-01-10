@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col } from 'react-bootstrap';
-import BookCover from './BookCover';
-import { getBooksCollectionIds, updateBooksCollection } from '../shared';
+import { Grid } from '@material-ui/core';
+import BookCover from '../BookCover';
+import { getBooksCollectionIds, updateBooksCollection } from './actions';
 
 const BookShelves = ( { books, pathname } ) => {
   const renderBookCovers = () => {
@@ -12,7 +12,7 @@ const BookShelves = ( { books, pathname } ) => {
       if ( Object.prototype.hasOwnProperty.call( books, key ) ) {
         const { key_id } = books[key];
         bookShelves.push(
-            <Col xs={6} md={4} lg={3} className="bookTile mb-2" key={`_${key_id}_`}>
+            <Grid item xs={6} md={4} lg={3} className="bookTile mb-2" key={`_${key_id}_`}>
               <BookCover
                 bookObj={{
                   ...books[key],
@@ -21,7 +21,7 @@ const BookShelves = ( { books, pathname } ) => {
                 updateCollection={updateBooksCollection}
                 pathname={pathname}
               />
-            </Col>
+            </Grid>
         );
       }
     }

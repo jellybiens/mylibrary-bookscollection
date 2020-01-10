@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Navigation from './Navigation';
-import { Container, Row, Col } from 'react-bootstrap';
-import BookShelves from './BookShelves';
+import { Grid } from '@material-ui/core';
+import Navigation from '../Navigation';
+import BookShelves from '../BookShelves';
 
 const MyBooks = ( { location: { pathname } } ) => {
   const renderBookCovers = () => {
@@ -10,11 +10,9 @@ const MyBooks = ( { location: { pathname } } ) => {
 
     if ( Object.entries( booksCollection ).length === 0 ) {
       return (
-        <Row>
-          <Col style={{ 'textAlign': 'center' }} >
-            Search for books to add to your collection...
-          </Col>
-        </Row>
+        <Grid item xs={12} style={{ 'textAlign': 'center' }} >
+          Search for books to add to your collection...
+        </Grid>
       );
     }
 
@@ -24,9 +22,9 @@ const MyBooks = ( { location: { pathname } } ) => {
   return (
     <>
       <Navigation path={pathname} />
-      <Container>
-        <Row> {renderBookCovers()} </Row>
-      </Container>
+      <Grid container spacing={3}>
+        {renderBookCovers()}
+      </Grid>
     </>
   );
 };

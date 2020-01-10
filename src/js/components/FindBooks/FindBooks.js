@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
-import Navigation from './Navigation';
-import { Container, Row, Col, Spinner } from 'react-bootstrap';
-import BookShelves from './BookShelves';
+import { Grid, CircularProgress } from '@material-ui/core';
+import Navigation from '../Navigation';
+import BookShelves from '../BookShelves';
 
 const BOOKS_SEARCH_QUERY = gql`
   query BooksSearchQuery($queryString: String = "Lord+of+the+rings") {
@@ -27,11 +27,11 @@ const FindBooks = ( { location: { pathname }, match: { params: { queryString } }
   const renderResults = () => {
     if ( loading ) {
       return (
-        <Col>
-          <Spinner className="d-block m-auto" animation="border" role="status">
+        <Grid item xs={12}>
+          <CircularProgress>
             <span className="sr-only">Loading...</span>
-          </Spinner>
-        </Col>
+          </CircularProgress>
+        </Grid>
       );
     }
     if ( error ) return <span>An error occurred.</span>;
@@ -43,11 +43,9 @@ const FindBooks = ( { location: { pathname }, match: { params: { queryString } }
   return (
     <>
       <Navigation path={pathname} />
-      <Container>
-        <Row>
-          { renderResults() }
-        </Row>
-      </Container>
+      <Grid container spacing={3}>
+        { renderResults() }
+      </Grid>
     </>
   );
 };

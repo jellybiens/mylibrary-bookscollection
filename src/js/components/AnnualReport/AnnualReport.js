@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Container, Row, Col, Table } from 'react-bootstrap';
+import { Grid } from '@material-ui/core';
+import { Table } from 'react-bootstrap';
 import NumericInput from 'react-numeric-input';
-import Navigation from './Navigation';
-import BookShelves from './BookShelves';
-import { split } from '../shared';
+import Navigation from '../Navigation';
+import BookShelves from '../BookShelves';
+import { split } from './actions';
 
 const AnnualReport = ( { location: { pathname } } ) => {
   const [not, rdn, fin] = split();
@@ -90,27 +91,25 @@ const AnnualReport = ( { location: { pathname } } ) => {
 
   const renderShelvesDefault = () => {
     return Object.entries( booksInView ).length === 0 ?
-    ( <Col style={{ 'textAlign': 'center' }} > Select row to view books. </Col> ) :
+    ( <Grid item style={{ 'textAlign': 'center' }} > Select row to view books. </Grid> ) :
     ( <BookShelves books={booksInView} pathname={pathname} /> );
   };
 
   return (
     <>
       <Navigation path={pathname} />
-      <Container fluid className="AnnualReportContainer">
-        <Row>
-          <Col xs={12} sm={12} md={4}>
-            <Container className="ReportContainer">
-              <Row> { renderReport() } </Row>
-            </Container>
-          </Col>
-          <Col xs={12} sm={12} md={8}>
-            <Container className="ShelvesContainer">
-              <Row> { renderShelvesDefault() } </Row>
-            </Container>
-          </Col>
-        </Row>
-      </Container>
+      <Grid container spacing={3} className="AnnualReportContainer">
+        <Grid item xs={12} sm={12} md={4}>
+          <Grid container spacing={3} className="ReportContainer">
+            { renderReport() }
+          </Grid>
+        </Grid>
+        <Grid item xs={12} sm={12} md={8}>
+          <Grid container spacing={3} className="ShelvesContainer">
+            { renderShelvesDefault() }
+          </Grid>
+        </Grid>
+      </Grid>
     </>
   );
 };

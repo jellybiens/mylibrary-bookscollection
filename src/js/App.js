@@ -4,6 +4,7 @@ import { ApolloProvider } from 'react-apollo';
 import { ApolloClient } from 'apollo-client';
 import { createHttpLink } from 'apollo-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import MyBooks from './components/MyBooks';
 import FindBooks from './components/FindBooks';
 import AnnualReport from './components/AnnualReport';
@@ -29,19 +30,29 @@ const client = new ApolloClient( {
   cache: new InMemoryCache(),
 } );
 
+const theme = createMuiTheme( {
+  palette: {
+    secondary: {
+      main: green[500],
+    },
+  },
+} );
+
 const App = () => (
   <BrowserRouter>
-    <ApolloProvider client={client}>
-      <Switch>
+    <ThemeProvider theme={theme}>
+      <ApolloProvider client={client}>
+        <Switch>
 
-        <Redirect path="/" to="/MyBooks" exact />
+          <Redirect path="/" to="/MyBooks" exact />
 
-        <Route path="/MyBooks" component={MyBooks} />
-        <Route path="/FindBooks/:queryString" component={FindBooks} />
-        <Route path="/AnnualReport" component={AnnualReport} />
+          <Route path="/MyBooks" component={MyBooks} />
+          <Route path="/FindBooks/:queryString" component={FindBooks} />
+          <Route path="/AnnualReport" component={AnnualReport} />
 
-      </Switch>
-    </ApolloProvider>
+        </Switch>
+      </ApolloProvider>
+    </ThemeProvider>
   </BrowserRouter>
 );
 

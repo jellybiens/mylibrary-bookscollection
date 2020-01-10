@@ -1,8 +1,21 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Image, Card, Button, Form } from 'react-bootstrap';
-import DatePicker from 'react-datepicker';
-import coverUnknown from '../../imgs/covernotfound.jpg';
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardActions,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+} from '@material-ui/core';
+import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
+import useStyles from './styles';
+import coverUnknown from '../../../imgs/covernotfound.jpg';
 
 const BookCover = (
     {
@@ -26,6 +39,7 @@ const BookCover = (
     `http://covers.openlibrary.org/b/id/${cover_i}-M.jpg` :
     coverUnknown;
 
+  const classes = useStyles();
   const [inCollection, setInCollection] = useState( bookInCollection );
   const [readStatus, setReadStatus] = useState( read_status );
   const [finishDate, setFinishDate] = useState( new Date( date ) );
@@ -64,68 +78,87 @@ const BookCover = (
     updateCollection( bookToUpdate );
   };
 
+  // MyBooks || FindBooks || AnnualReport = null
   const renderBookCoverOptions = () => {
     if ( pathname === '/MyBooks' ) {
       return (
         <>
-          <div className="CardBookStatus" >
-            <Form>
-              <Form.Control className="statusDd" value={readStatus} onChange={handleSelectChange} as="select">
-                <option value="not">Not read</option>
-                <option value="rdn">Reading</option>
-                <option value="fin">Finished</option>
-              </Form.Control>
-            </Form>
-          </div>
-          <div className="CardFinishDate" >
-            { readStatus === 'fin' &&
-              <DatePicker
-                id="datePicker"
-                className="form-control"
-                selected={finishDate}
-                onChange={handleDateChange}
-                dateFormat="MM/yyyy"
-                showMonthYearPicker
-              />
-            }
-          </div>
+          <FormControl className={classes.formControl}>
+            <InputLabel id="read-status-label">Status</InputLabel>
+            <Select
+              labelId="read-status-label"
+              id="read-status-select"
+              value={readStatus}
+              onChange={handleSelectChange}
+            >
+              <MenuItem value="not">Not read</MenuItem>
+              <MenuItem value="rdn">Reading</MenuItem>
+              <MenuItem value="fin">Finished</MenuItem>
+            </Select>
+          </FormControl>
+
+          { readStatus === 'fin' &&
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <DatePicker
+              className={classes.datepicker}
+              views={['year', 'month']}
+              label="Finish date"
+              minDate={new Date( '2000-01-01' )}
+              maxDate={new Date()}
+              format='MMM yyyy'
+              value={finishDate}
+              onChange={handleDateChange}
+            />
+          </MuiPickersUtilsProvider>
+          }
         </>
       );
     } else if ( pathname.startsWith( '/FindBooks' ) ) {
     // Button to add to collection for FindBooks, can be disabled if already owned
       return (
-        <div className="CardButton" >
-          <Button
-            disabled={inCollection}
-            className={inCollection ? 'disabled' : 'addBook'}
-            variant={inCollection ? 'outline-success' : 'outline-primary'}
-            onClick={handleAddToCollection}
-          >
-            {inCollection ? 'In collection' : 'Add to my books'}
-          </Button>
-        </div>
+        <Button
+          disabled={inCollection}
+          className={classes.button}
+          onClick={handleAddToCollection}
+          variant="contained"
+          color={inCollection ? 'primary' : 'secondary'}
+        >
+          {inCollection ? 'In collection' : 'Add to my books'}
+        </Button>
       );
     }
   };
 
   return (
-    <Card key={key_id}>
-      <Card.Body className={
-        inCollection && pathname.startsWith( '/FindBooks' ) ?
-        'CardBody disabled' : 'CardBody'
-      }>
-        <Card.Title className="CardTitle">{title}</Card.Title>
-        <Card.Subtitle className="CardAuthor text-muted">{author_name}</Card.Subtitle>
-        <Card.Subtitle className="CardYear text-muted">{first_publish_year ? first_publish_year : 'Unknown Year'}</Card.Subtitle>
-        <div className="CardImage">
-          <Image rounded
-            className="bookThumb"
-            src={cover}
-          />
-        </div>
-        <Card.Subtitle className="CardIsbn text-muted">{'ISBN: ' + isbn}</Card.Subtitle>
+    <Card
+      key={key_id}
+      className={classes.card}
+    >
+      <CardHeader
+        title={title}
+        subheader={author_name + ', ' + ( first_publish_year ? first_publish_year : 'Unknown Year' )}
+      />
+
+      <CardContent>
+        <img
+          src={cover}
+          className='bookThumb'
+          alt={title + '_img'}
+        />
+        <Typography
+          variant="body2"
+          color="textSecondary"
+          component="p"
+        >
+          {'ISBN: ' + isbn}
+        </Typography>
+      </CardContent>
+
+      <CardActions disableSpacing>
         {renderBookCoverOptions()}
-      </Card.Body>
+
+      </CardActions>
+
     </Card>
   );
 };
